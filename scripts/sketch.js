@@ -34,7 +34,7 @@ var sketch = function (canvas) {
 
   canvas.setContextProperties(defaultProperties);
 
-  var heading = HyperbolicCanvas.Angle.random();
+  var heading = Math.PI;
   var headingIncrement = Math.TAU / 100;
   var velocity = 0;
   var velocityIncrement = .002;
@@ -62,6 +62,17 @@ var sketch = function (canvas) {
   );
   var front;
 
+  var _rotate = function (dw) {
+    var canvEl = canvas.getCanvasElement();
+    var centerX = canvEl.width / 2;
+    var centerY = canvEl.height / 2;
+
+    ctx.translate(centerX, centerY);
+    ctx.rotate(dw);
+    ctx.translate(-centerX, -centerY);
+  };
+  _rotate(Math.PI / 2);
+
   var drawShip = function () {
     front = location.hyperbolicDistantPoint(.1, heading);
     var left = location.hyperbolicDistantPoint(.05, heading + wingAngle);
@@ -77,7 +88,7 @@ var sketch = function (canvas) {
     var path = canvas.pathForHyperbolic(
       HyperbolicCanvas.Line.givenTwoPoints(front.hyperbolicSubtract(location), location.hyperbolicDistantPoint(30).hyperbolicSubtract(location))
     );
-    canvas.stroke(path);
+    // canvas.stroke(path);
     canvas.setContextProperties(defaultProperties);
 
     // draw ship
@@ -102,7 +113,10 @@ var sketch = function (canvas) {
         var ul = HyperbolicCanvas.Point.givenCoordinates((2*i-1)*(s/2),(2*j+1)*(s/2));
         var bl = HyperbolicCanvas.Point.givenCoordinates((2*i-1)*(s/2),(2*j-1)*(s/2));
         var br = HyperbolicCanvas.Point.givenCoordinates((2*i+1)*(s/2),(2*j-1)*(s/2));
-
+        // var ur = HyperbolicCanvas.Point.givenCoordinates(0.5,0.5);
+        // var ul = HyperbolicCanvas.Point.givenCoordinates(-0.5,0.5);
+        // var bl = HyperbolicCanvas.Point.givenCoordinates(-0.5,-0.5);
+        // var br = HyperbolicCanvas.Point.givenCoordinates(0.5,-0.5);
         canvas.setContextProperties({ strokeStyle: col , fillStyle: col});
         path = canvas.pathForHyperbolic(HyperbolicCanvas.Polygon.givenVertices([
           ur.hyperbolicSubtract(location),
@@ -114,7 +128,6 @@ var sketch = function (canvas) {
       }
     }
   };
-
 
   var checkCollision = function () {
     var x = location.getX();
@@ -140,18 +153,12 @@ var sketch = function (canvas) {
     shouldRender ^= true;
     boost = 16 in keysDown ? 3 : 1;
 
-    if (37 in keysDown || 65 in keysDown) {
-      heading += headingIncrement * boost;
-    }
-    if (39 in keysDown || 68 in keysDown) {
-      heading -= headingIncrement * boost;
-    }
-
     if (38 in keysDown || 87 in keysDown) {
       if (velocity < maxVelocity) {
         velocity += velocityIncrement * boost;
       }
     }
+
     if (40 in keysDown || 83 in keysDown) {
       if (velocity > 0) {
         velocity -= velocityIncrement;
@@ -161,8 +168,17 @@ var sketch = function (canvas) {
       }
     }
 
+    if (37 in keysDown || 65 in keysDown) {
+      heading += headingIncrement * boost;
+      _rotate(headingIncrement * boost);
+    }
+    if (39 in keysDown || 68 in keysDown) {
+      heading -= headingIncrement * boost;
+      _rotate(- headingIncrement * boost);
+    }
+
     location = location.hyperbolicDistantPoint(velocity, heading);
-    heading = location.getDirection();
+    // heading = location.getDirection();
     velocity *= .99;
 
     checkCollision();
@@ -180,7 +196,7 @@ var sketch = function (canvas) {
   addEventListener('keyup', function (e) {
     delete keysDown[e.keyCode];
   }, false);
-};
+}
 
 function setup() {
   noCanvas();
