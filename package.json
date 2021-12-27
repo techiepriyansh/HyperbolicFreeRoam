@@ -1,0 +1,17 @@
+{
+  "name": "hyperbolic-outrun-chase",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib_index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "compile": "browserify lib_index.js > dist/hyperbolic_canvas.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^17.0.0"
+  }
+}
